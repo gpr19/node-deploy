@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongo
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }).then(() => {
-    console.log('conecatado')
+    console.log('conecatadoo')
 }).catch((err) => {
     console.log(err)
 })
