@@ -21,7 +21,7 @@ mongoose.connect('mongodb+srv://bielpr19:' + process.env.DB_PASS + '@cluster0.py
 })
 
 app.get('/', (req, res) => {
-    return res.json({titulo: 'criar APIss'})
+    return res.json({titulo: 'criar API'})
 })
 
 app.get('/user', (req, res) => {
