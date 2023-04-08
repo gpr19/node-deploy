@@ -12,7 +12,7 @@ const app = express()
 app.use(express.json())
 
 /// CONECATAR NO BANCO DE DADOS
-mongoose.connect(process.env.DB_PASS, {
+mongoose.connect("mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongodb.net/folhetosdecanto", {
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }).then(() => {
