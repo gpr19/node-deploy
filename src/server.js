@@ -1,6 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 
+require ('custom-env').env('staging')
+
 require('./models/users')
 
 const User = mongoose.model('user')
@@ -9,7 +11,7 @@ const app = express()
 
 app.use(express.json())
 
-mongoose.connect('mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongodb.net/folhetosdecanto', {
+mongoose.connect('mongodb+srv://bielpr19:' + process.env.DB_PASS + '@cluster0.pydjipv.mongodb.net/folhetosdecanto', {
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }).then(() => {
@@ -17,8 +19,6 @@ mongoose.connect('mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongo
 }).catch((err) => {
     console.log(err)
 })
-
-console.log('teste')
 
 app.get('/', (req, res) => {
     return res.json({titulo: 'criar APIss'})
