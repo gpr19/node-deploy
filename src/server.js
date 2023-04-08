@@ -20,11 +20,11 @@ mongoose.connect('mongodb+srv://bielpr19:' + process.env.DB_PASS + '@cluster0.py
     console.log(err)
 })
 
-app.get('/', (req, res) => {
-    return res.json({titulo: 'criar API'})
-})
+// app.get('/', (req, res) => {
+//     return res.json({titulo: 'criar API'})
+// })
 
-app.get('/user', (req, res) => {
+app.get('/', (req, res) => {
     User.find({}).then((user) =>{
         return res.json(user)
     }).catch((err) => {
