@@ -37,7 +37,9 @@ app.get('/user', (req, res) => {
 
 
 app.get('/user/:username', (req, res) => {
+    
     console.log(req.params.username)
+    res.json(req.params.username)
 
     User.findOne({username: req.params.username}).then((user) => {
         return res.json(user)
