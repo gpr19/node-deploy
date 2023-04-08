@@ -18,6 +18,7 @@ mongoose.connect('mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongo
     console.log(err)
 })
 
+console.log('teste')
 
 app.get('/', (req, res) => {
     return res.json({titulo: 'criar API'})
