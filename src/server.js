@@ -17,7 +17,7 @@ mongoose.connect(process.env.MONGO_URL, {
 }).then(() => {
     console.log('conecatadoo')
 }).catch((err) => {
-    console.log(err)
+    console.log('Error: ' + err)
 })
 
 const missaRouter = express.Router();
