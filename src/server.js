@@ -1,18 +1,17 @@
-require ('custom-env').env('staging')
-require('./models/users')
+require('dotenv').config()
 
-const express = require('express')
-const mongoose = require('mongoose')
+const missaController = require('./controllers/missas.controller')
+const userController = require('./controllers/users.controller')
+const musicaController = require('./controllers/musicas.controller')
 const upLoadMissa = require('./middlewares/uploadimage')
-const path = require('path')
 
-const User = mongoose.model('user')
+const mongoose = require('mongoose')
+const express = require('express')
 const app = express()
-
 app.use(express.json())
 
 /// CONECATAR NO BANCO DE DADOS
-mongoose.connect("mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongodb.net/folhetosdecanto", {
+mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }).then(() => {
@@ -21,70 +20,49 @@ mongoose.connect("mongodb+srv://bielpr19:ALYd3AXi5DGgcd2b@cluster0.pydjipv.mongo
     console.log(err)
 })
 
+const missaRouter = express.Router();
+const userRouter = express.Router();
+const musicaRouter = express.Router();
+
+//#region MISSA
+missaRouter.route('/missa')
+    .get(missaController.getAll)
+    .post(upLoadMissa.single('image'), missaController.createOne)
+
+missaRouter.route('/missa/:id')
+    .get(missaController.getOne)
+    .patch(upLoadMissa.single('image'), missaController.updateOne)
+    .delete(missaController.deleteOne)
+//#endregion    
+
+//#region USER
+userRouter.route('/user')
+    .get(userController.getAll)
+    .post(userController.createOne)
+
+    userRouter.route('/user/:username')
+    .get(userController.getOne)
+    .patch(userController.updateOne)
+    .delete(userController.deleteOne)
+//#endregion
+
+//#region MUSICA
+musicaRouter.route('/musica')
+    .get(musicaController.getAll)
+    .post(musicaController.createOne)
+//#endregion
+
+const path = require('path')
+
+app.use(missaRouter)
+app.use(userRouter)
+app.use(musicaRouter)
+app.use('/files', express.static(path.resolve(__dirname, "..", "tmp", "upload")))
+
 /// HOME
 app.get('/', (req, res) => {
-    return res.json({titulo: 'criar API'})
-})
-
-/// UPLOAD DE IMAGEM DA MISSA
-app.post('/upload-image', upLoadMissa.single('image'), async (req, res) => {
-
-    if (req.file){
-        return res.json({
-            error: false,
-            message: "Upload realizado com sucesso"
-        })
-    }
-
-    return res.status(400).json({
-        error: true,
-        message: "Erro: Upload não foi realizado"
-    })
-    
-})
-
-// console.log(path.resolve(__dirname, "../public", "upload"))
-
-/// PEGAR IMAGEMS
-app.use('/files', express.static(path.resolve(__dirname, "../public", "upload")))
-
-/// LISTAR UNICO USUARIO
-app.get('/user/:username', (req, res) => {
-    User.findOne({username: req.params.username}).then((user) => {
-        return res.json(user)
-    }).catch((err) => {
-        return res.status(400).json({
-            error: true,
-            message: 'Nenhum usuario encontrado'
-        })
-    })
-})
-
-/// LISTAR TODOS USUARIOS
-app.get('/user', (req, res) => {
-    User.find({}).then((user) =>{
-        return res.json(user)
-    }).catch((err) => {
-        return res.status(400).json({
-            error: true,
-            message: err._message
-        })
-    })
-})
-
-/// CRIAR USUARIO
-app.post('/user', (req, res) => {
-    User.create(req.body).then((result) => {
-        res.status(200).json({
-            error: false,
-            message: 'Cadastrado com sucesso'
-        })
-    }).catch((err) =>{
-        res.status(400).json({
-            error: true,
-            message: err._message
-        })
-    })
+    console.log(process.env.MONGO_URL)
+    return res.json({titulo: 'API folhetos de canto'})
 })
 
 app.listen(3333, () => {
