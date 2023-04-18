@@ -1,49 +1,50 @@
-const mongoose = require('mongoose')
-const aws = require('aws-sdk')
-const fs = require('fs')
-const path = require('path')
-const { promisify } = require('util') 
+const mongoose = require('mongoose');
+const aws = require('aws-sdk');
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
 
-const s3 = new aws.S3()
+const s3 = new aws.S3();
 
 const Missa = new mongoose.Schema({
     missa: {
         type: String,
-        required: true
+        required: true,
     },
     descricao: {
         type: String,
-        default: ""
+        default: '',
     },
     data: {
         type: String,
-        required: true
+        required: true,
     },
     url: {
         type: String,
-        required: true
+        required: true,
     },
     imagem: {
         type: String,
-        default: ""
+        default: '',
     },
     musicas: {
         type: String,
-        default: ""
+        default: '',
+    },
+});
+
+Missa.pre('deleteOne', function () {
+    if (process.env.STORAGE_TYPE === 's3') {
+        console.log('toaqui', this.getQuery().imagem);
+        return s3
+            .deleteObject({
+                Bucket: 'folhetosdecanto',
+                Key: this.getQuery().imagem,
+            })
+            .promise();
+    } else {
+        return promisify(fs.unlink)(path.resolve(__dirname, '..', '..', 'tmp', 'upload', this.getQuery().imagem));
     }
+});
 
-})
-
-Missa.pre("deleteOne", function() {
-    if(process.env.STORAGE_TYPE === 's3'){
-        console.log('toaqui', this.getQuery().imagem)
-        return s3.deleteObject({        
-            Bucket: 'folhetosdecanto',
-            Key: this.getQuery().imagem
-        }).promise()
-    }else{
-        return promisify(fs.unlink)(path.resolve(__dirname, '..', '..', 'tmp', 'upload', this.getQuery().imagem))
-    }
-})
-
-mongoose.model('missa', Missa)
+mongoose.model('missa', Missa);

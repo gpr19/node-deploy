@@ -1,35 +1,34 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const Musica = new mongoose.Schema({
     nome: {
         type: String,
-        required: true
+        required: true,
     },
     url: {
         type: String,
-        required: true
+        required: true,
     },
     videourl: {
         type: String,
-        default: ""
+        default: '',
     },
     categoria: {
         type: String,
-        default: ""
+        default: '',
     },
     subcategoria: {
         type: String,
-        default: ""
+        default: '',
     },
     letra: {
         type: String,
-        default: ""
+        default: '',
     },
     cifra: {
         type: String,
-        default: ""
-    }
+        default: '',
+    },
+});
 
-})
-
-mongoose.model('musica', Musica)
+mongoose.model('musica', Musica);
