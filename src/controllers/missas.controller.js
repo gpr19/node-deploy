@@ -3,8 +3,27 @@ require('../models/missas');
 const mongoose = require('mongoose');
 const Missa = mongoose.model('missa');
 
+exports.getNext = (req, res) => {
+    const date = new Date();
+    const now = date.toISOString().split('T')[0];
+
+    Missa.find({})
+        .sort({ data: 1 })
+        .where({ data: { $gte: now } })
+        .then((missa) => {
+            return res.json(missa);
+        })
+        .catch((err) => {
+            return res.status(400).json({
+                error: true,
+                message: 'Error: ' + err,
+            });
+        });
+};
+
 exports.getAll = (req, res) => {
     Missa.find({})
+        .sort({ data: 1 })
         .then((missa) => {
             return res.json(missa);
         })

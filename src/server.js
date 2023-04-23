@@ -45,8 +45,10 @@ app.get('/', (req, res) => {
 //#region MISSA
 missaRouter
     .route('/missa')
-    .get(missaController.getAll)
+    .get(missaController.getNext)
     .post(upLoadMissa.any('image'), missaController.createOne);
+
+missaRouter.route('/missa/all').get(missaController.getAll);
 
 missaRouter
     .route('/missa/:id')

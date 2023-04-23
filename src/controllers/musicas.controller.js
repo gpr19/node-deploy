@@ -5,6 +5,7 @@ const Musicas = mongoose.model('musica');
 
 exports.getAll = (req, res) => {
     Musicas.find({})
+        .sort({ nome: 1 })
         .then((musicas) => {
             return res.json(musicas);
         })

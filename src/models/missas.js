@@ -43,7 +43,9 @@ Missa.pre('deleteOne', function () {
             })
             .promise();
     } else {
-        return promisify(fs.unlink)(path.resolve(__dirname, '..', '..', 'tmp', 'upload', this.getQuery().imagem));
+        return promisify(fs.unlink)(
+            path.resolve(__dirname, '..', '..', 'tmp', 'upload', this.getQuery().imagem)
+        );
     }
 });
 
