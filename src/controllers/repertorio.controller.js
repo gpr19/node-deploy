@@ -1,15 +1,11 @@
-require('../models/missas');
+require('../models/repertorio');
 
 const mongoose = require('mongoose');
-const Missa = mongoose.model('missa');
+const Repertorio = mongoose.model('repertorio');
 
-exports.getNext = (req, res) => {
-    const date = new Date();
-    const now = date.toISOString().split('T')[0];
-
-    Missa.find({})
+exports.getAll = (req, res) => {
+    Repertorio.find({ username: req.params.id })
         .sort({ data: 1 })
-        .where({ data: { $gte: now } })
         .then((missa) => {
             return res.json(missa);
         })
@@ -21,9 +17,8 @@ exports.getNext = (req, res) => {
         });
 };
 
-exports.getAll = (req, res) => {
-    Missa.find({})
-        .sort({ data: 1 })
+exports.getUnique = (req, res) => {
+    Repertorio.find({ _id: req.params.id })
         .then((missa) => {
             return res.json(missa);
         })
@@ -36,26 +31,10 @@ exports.getAll = (req, res) => {
 };
 
 exports.getOne = (req, res) => {
-    Missa.findOne({ url: req.params.id })
-        .then((missa) => {
-            if (!missa) {
-                return res.status(400).json({
-                    error: true,
-                    message: 'Nada encontrado',
-                });
-            }
-            return res.json(missa);
-        })
-        .catch((err) => {
-            return res.status(400).json({
-                error: true,
-                message: 'Error: ' + err,
-            });
-        });
-};
+    const checkIsDataOrIsId = req.params.id.search('-') != -1 ? true : false;
+    const query = checkIsDataOrIsId ? { data: req.params.id } : { _id: req.params.id };
 
-exports.getOneByDate = (req, res) => {
-    Missa.findOne({ data: req.params.id })
+    Repertorio.findOne({ ...query, username: req.params.username })
         .then((missa) => {
             if (!missa) {
                 return res.status(200).json({
@@ -76,26 +55,11 @@ exports.getOneByDate = (req, res) => {
 exports.createOne = async (req, res) => {
     const data = req.body;
 
-    const checkUnique = await Missa.find({ url: data.url });
-
-    if (checkUnique.length != 0)
-        return res.send({
-            error: true,
-            message: 'Já existe uma musica com este link',
-        });
-
-    let file = '';
-    if (req.files) {
-        file = req.files[0].key;
-    }
-
-    Missa.create({
+    Repertorio.create({
         missa: data.name,
         data: data.date,
-        url: data.url,
-        descricao: data.description,
         musicas: data.musics,
-        imagem: file,
+        username: data.username,
     })
         .then(() => {
             res.status(200).json({
@@ -114,7 +78,7 @@ exports.createOne = async (req, res) => {
 exports.updateOne = (req, res) => {
     const data = req.body;
 
-    Missa.findOne({ url: data.currentMissa })
+    Repertorio.findOne({ _id: data.id })
         .then((missa) => {
             if (!missa) {
                 return res.status(400).json({
@@ -122,20 +86,11 @@ exports.updateOne = (req, res) => {
                     message: 'Nada encontrado',
                 });
             }
-            let file = missa.imagem;
-            if (req.file) {
-                file = req.files[0].key;
-            }
-
-            Missa.updateOne(
-                { url: data.currentMissa },
+            Repertorio.updateOne(
+                { _id: data.id },
                 {
                     missa: data.name,
-                    data: data.date,
-                    url: data.url,
-                    descricao: data.description,
                     musicas: data.musics,
-                    imagem: file,
                 }
             )
                 .then(() => {
@@ -160,7 +115,7 @@ exports.updateOne = (req, res) => {
 };
 
 exports.deleteOne = (req, res) => {
-    Missa.findOne({ url: req.params.id })
+    Repertorio.findOne({ _id: req.params.id })
         .then((missa) => {
             if (!missa) {
                 return res.status(400).json({
@@ -168,7 +123,7 @@ exports.deleteOne = (req, res) => {
                     message: 'Nada encontrado',
                 });
             }
-            Missa.deleteOne({ imagem: missa.imagem })
+            Repertorio.deleteOne({ _id: missa._id })
                 .then((result) => {
                     res.status(200).json({
                         error: false,

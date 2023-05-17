@@ -132,17 +132,33 @@ exports.updateOne = (req, res) => {
 };
 
 exports.deleteOne = (req, res) => {
-    Musicas.deleteOne({ url: req.params.url })
-        .then((result) => {
-            res.status(200).json({
-                error: false,
-                message: 'Deletado com sucesso, total linhas deletadas: ' + result.deletedCount,
-            });
+    Musicas.findOne({ url: req.params.id })
+        .then((musica) => {
+            if (!musica) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'Nada encontrado',
+                });
+            }
+            Musicas.deleteOne({ _id: musica._id })
+                .then((result) => {
+                    res.status(200).json({
+                        error: false,
+                        message:
+                            'Deletado com sucesso, total linhas deletadas: ' + result.deletedCount,
+                    });
+                })
+                .catch((err) => {
+                    res.status(400).json({
+                        error: true,
+                        message: 'Não foi deletado' + err,
+                    });
+                });
         })
         .catch((err) => {
-            res.status(400).json({
+            return res.status(400).json({
                 error: true,
-                message: 'Não foi deletado',
+                message: 'Nada encontrado ' + err,
             });
         });
 };

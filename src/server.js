@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const missaController = require('./controllers/missas.controller');
+const repertorioController = require('./controllers/repertorio.controller');
 const userController = require('./controllers/users.controller');
 const musicaController = require('./controllers/musicas.controller');
 const upLoadMissa = require('./middlewares/uploadimage');
@@ -33,6 +34,7 @@ mongoose
     });
 
 const missaRouter = express.Router();
+const repertorioRouter = express.Router();
 const userRouter = express.Router();
 const musicaRouter = express.Router();
 
@@ -50,11 +52,29 @@ missaRouter
 
 missaRouter.route('/missa/all').get(missaController.getAll);
 
+missaRouter.route('/missa/date/:id').get(missaController.getOneByDate);
+
 missaRouter
     .route('/missa/:id')
     .get(missaController.getOne)
     .put(upLoadMissa.any('image'), missaController.updateOne)
     .delete(missaController.deleteOne);
+//#endregion
+
+//#region REPERTORIO
+
+repertorioRouter.route('/repertorio').post(repertorioController.createOne);
+
+repertorioRouter
+    .route('/repertorio/:id')
+    .get(repertorioController.getAll)
+    .put(repertorioController.updateOne)
+    .delete(repertorioController.deleteOne);
+
+repertorioRouter.route('/repertorio/one/:id').get(repertorioController.getUnique);
+
+repertorioRouter.route('/repertorio/one/:id/:username').get(repertorioController.getOne);
+
 //#endregion
 
 //#region USER
@@ -72,7 +92,11 @@ userRouter.route('/user/auth/login').post(userController.login);
 //#region MUSICA
 musicaRouter.route('/musica').get(musicaController.getAll).post(musicaController.createOne);
 
-musicaRouter.route('/musica/:id').get(musicaController.getOne).put(musicaController.updateOne);
+musicaRouter
+    .route('/musica/:id')
+    .get(musicaController.getOne)
+    .put(musicaController.updateOne)
+    .delete(musicaController.deleteOne);
 
 musicaRouter.route('/musica/:type/:subtype').get(musicaController.getTypes);
 //#endregion
@@ -82,6 +106,7 @@ const path = require('path');
 app.use(missaRouter);
 app.use(userRouter);
 app.use(musicaRouter);
+app.use(repertorioRouter);
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp', 'upload')));
 
 app.listen(3333, () => {
